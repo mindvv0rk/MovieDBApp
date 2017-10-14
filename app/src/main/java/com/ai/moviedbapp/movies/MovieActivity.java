@@ -1,4 +1,6 @@
-package com.ai.moviedbapp;
+package com.ai.moviedbapp.movies;
+
+import com.ai.moviedbapp.R;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
