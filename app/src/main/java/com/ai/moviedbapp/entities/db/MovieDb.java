@@ -23,6 +23,12 @@ public class MovieDb extends RealmObject {
                 movie.getVote(), movie.getPopularity(), movie.getReleaseDate(), movie.getPosterPath());
     }
 
+    public static MovieDb createFormRealmObject(MovieDb realmMovie) {
+        return new MovieDb(realmMovie.getId(), realmMovie.getName(),
+                realmMovie.getDescription(), realmMovie.getRating(), realmMovie.getPopularity(),
+                realmMovie.getReleaseDate(), realmMovie.getPosterPath(), realmMovie.getPoster());
+    }
+
     public MovieDb() {
     }
 
@@ -35,6 +41,17 @@ public class MovieDb extends RealmObject {
         mPopularity = popularity;
         mReleaseDate = releaseDate;
         mPosterPath = posterPath;
+    }
+
+    public MovieDb(long id, String name, String description, double rating, double popularity, String releaseDate, String posterPath, byte[] poster) {
+        mId = id;
+        mName = name;
+        mDescription = description;
+        mRating = rating;
+        mPopularity = popularity;
+        mReleaseDate = releaseDate;
+        mPosterPath = posterPath;
+        mPoster = poster;
     }
 
     public String getPosterPath() {

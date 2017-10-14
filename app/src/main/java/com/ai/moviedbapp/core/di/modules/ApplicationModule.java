@@ -4,6 +4,8 @@ import com.ai.moviedbapp.core.network.IConfigurationApi;
 import com.ai.moviedbapp.core.network.IImageApi;
 import com.ai.moviedbapp.core.network.IMovieApi;
 import com.ai.moviedbapp.core.network.NetworkModuleFactory;
+import com.ai.moviedbapp.repository.DbRepository;
+import com.ai.moviedbapp.repository.IDbRepository;
 import com.ai.moviedbapp.repository.IPreferencesRepository;
 import com.ai.moviedbapp.repository.PreferencesRepository;
 
@@ -51,5 +53,11 @@ public class ApplicationModule {
     @Singleton
     public IPreferencesRepository providePreferences(Context context) {
         return new PreferencesRepository(context);
+    }
+
+    @Provides
+    @Singleton
+    public IDbRepository provideRealmRepository() {
+        return new DbRepository();
     }
 }

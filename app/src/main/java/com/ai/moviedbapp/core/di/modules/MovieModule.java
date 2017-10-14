@@ -8,6 +8,7 @@ import com.ai.moviedbapp.interactor.configuration.ConfigurationInteractor;
 import com.ai.moviedbapp.interactor.configuration.IConfigurationInteractor;
 import com.ai.moviedbapp.interactor.movie.IMovieInteractor;
 import com.ai.moviedbapp.interactor.movie.MovieInteractor;
+import com.ai.moviedbapp.repository.IDbRepository;
 import com.ai.moviedbapp.repository.IPreferencesRepository;
 
 import dagger.Module;
@@ -28,8 +29,9 @@ public class MovieModule {
     public IMovieInteractor provideMovieInteractor(
             IMovieApi movieApi,
             IImageApi imageApi,
-            IPreferencesRepository preferencesRepository) {
-        return new MovieInteractor(movieApi, imageApi, preferencesRepository);
+            IPreferencesRepository preferencesRepository,
+            IDbRepository dbRepository) {
+        return new MovieInteractor(movieApi, imageApi, preferencesRepository, dbRepository);
     }
 
 
