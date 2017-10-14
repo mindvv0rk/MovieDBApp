@@ -37,13 +37,8 @@ public final class NetworkModuleFactory {
     }
 
     public static IImageApi createImageApi() {
-        OkHttpClient httpClient = createOkHttpClient(IMAGE_HTTP_LOG_TAG);
-
-        Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .client(httpClient);
-
-        return retrofitBuilder.build().create(IImageApi.class);
+        String url = BASE_URL + API_VERSION + SLASH;
+        return createAPI(url, IImageApi.class, MOVIE_HTTP_LOG_TAG);
     }
 
     private static OkHttpClient createOkHttpClient(final String httpLogTag) {

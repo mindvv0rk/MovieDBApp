@@ -1,4 +1,0 @@
-package com.ai.moviedbapp.interactor;
-
-public interface IMovieInteractor {
-}

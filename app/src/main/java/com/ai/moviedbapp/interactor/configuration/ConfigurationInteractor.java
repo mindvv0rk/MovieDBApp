@@ -12,6 +12,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import rx.Completable;
+import rx.Single;
 import rx.functions.Func1;
 
 public final class ConfigurationInteractor implements IConfigurationInteractor {
@@ -29,16 +30,14 @@ public final class ConfigurationInteractor implements IConfigurationInteractor {
     }
 
     @Override
-    public Completable requestConfiguration() {
+    public Single<String> requestConfiguration() {
         return mConfigurationApi
                 .getConfiguration(NetworkModuleFactory.TOKEN)
                 .map(createBaseImageUrl())
                 .map(baseUrl -> {
-                    Log.i("TAG", baseUrl);
                     mPreferencesRepository.saveImageBaseUrl(baseUrl);
                     return baseUrl;
-                })
-                .toCompletable();
+                });
     }
 
     private Func1<ConfigurationResponse, String> createBaseImageUrl() {

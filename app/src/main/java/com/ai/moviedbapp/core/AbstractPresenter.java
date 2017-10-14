@@ -26,7 +26,7 @@ public abstract class AbstractPresenter<V extends IView> {
         return mView != null;
     }
 
-    public V getViews() {
+    public V getView() {
         return mView;
     }
 
