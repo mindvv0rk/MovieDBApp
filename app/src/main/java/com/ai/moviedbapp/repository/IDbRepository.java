@@ -1,4 +1,4 @@
 package com.ai.moviedbapp.repository;
 
-public interface IApiRepository {
+public interface IDbRepository {
 }

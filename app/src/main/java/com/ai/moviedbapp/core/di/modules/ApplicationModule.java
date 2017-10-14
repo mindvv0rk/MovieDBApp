@@ -4,7 +4,8 @@ import com.ai.moviedbapp.core.network.IConfigurationApi;
 import com.ai.moviedbapp.core.network.IImageApi;
 import com.ai.moviedbapp.core.network.IMovieApi;
 import com.ai.moviedbapp.core.network.NetworkModuleFactory;
-import com.ai.moviedbapp.repository.IApiRepository;
+import com.ai.moviedbapp.repository.IPreferencesRepository;
+import com.ai.moviedbapp.repository.PreferencesRepository;
 
 import android.content.Context;
 
@@ -44,5 +45,11 @@ public class ApplicationModule {
     @Singleton
     public IImageApi provideImageApi() {
         return NetworkModuleFactory.createImageApi();
+    }
+
+    @Provides
+    @Singleton
+    public IPreferencesRepository providePreferences(Context context) {
+        return new PreferencesRepository(context);
     }
 }
