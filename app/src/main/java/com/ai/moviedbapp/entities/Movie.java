@@ -8,16 +8,16 @@ public final class Movie {
 
     private long mId;
     private String mName;
-    private byte[] mPoster;
+    private String mPosterPath;
 
-    public Movie(long id, String name, byte[] poster) {
+    public Movie(long id, String name, String posterPath) {
         mId = id;
         mName = name;
-        mPoster = poster;
+        mPosterPath = posterPath;
     }
 
     public static Movie createFromDbo(MovieDb movieDb) {
-        return new Movie(movieDb.getId(), movieDb.getName(), movieDb.getPoster());
+        return new Movie(movieDb.getId(), movieDb.getName(), movieDb.getPosterPath());
     }
 
     public long getId() {
@@ -28,7 +28,8 @@ public final class Movie {
         return mName;
     }
 
-    public byte[] getPoster() {
-        return mPoster;
+    public String getPosterPath() {
+        return mPosterPath;
     }
 }
+

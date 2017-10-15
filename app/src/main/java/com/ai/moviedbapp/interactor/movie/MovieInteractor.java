@@ -61,10 +61,10 @@ public class MovieInteractor implements IMovieInteractor {
                     .flatMapIterable(MovieResponse::getMovies)
                     .observeOn(Schedulers.computation())
                     .map(saveMovieToDb())
-                    .observeOn(Schedulers.io())
-                    .flatMap(loadImage())
-                    .observeOn(Schedulers.computation())
-                    .map(movieDb -> mDbRepository.insertOrUpdateMovie(movieDb))
+//                    .observeOn(Schedulers.io())
+//                    .flatMap(loadImage())
+//                    .observeOn(Schedulers.computation())
+//                    .map(movieDb -> mDbRepository.insertOrUpdateMovie(movieDb))
                     .map(Movie::createFromDbo)
                     .toList()
                     .toSingle());
@@ -75,51 +75,52 @@ public class MovieInteractor implements IMovieInteractor {
 
     private Func1<MovieResponse.Movie, MovieDb> saveMovieToDb() {
         return movie -> {
-            MovieDb movieDb = MovieDb.createFromServerMovie(movie);
+            String posterUrl = mPreferencesRepository.getImageBaseUrl() + movie.getPosterPath();
+            MovieDb movieDb = MovieDb.createFromServerMovie(movie, posterUrl);
             return mDbRepository.insertOrUpdateMovie(movieDb);
         };
     }
 
-    private Func1<MovieDb, Observable<MovieDb>> loadImage() {
-        return movieDb -> {
-            if (TextUtils.isEmpty(movieDb.getPosterPath())) {
-                return Observable.just(movieDb);
-            }
+//    private Func1<MovieDb, Observable<MovieDb>> loadImage() {
+//        return movieDb -> {
+//            if (TextUtils.isEmpty(movieDb.getPosterPath())) {
+//                return Observable.just(movieDb);
+//            }
+//
+//            String posterUrl = mPreferencesRepository.getImageBaseUrl() + movieDb.getPosterPath();
+//            return mImageApi
+//                    .getImage(posterUrl)
+//                    .toObservable()
+//                    .map(convertImageToByteArray(movieDb));
+//        };
+//    }
 
-            String posterUrl = mPreferencesRepository.getImageBaseUrl() + movieDb.getPosterPath();
-            return mImageApi
-                    .getImage(posterUrl)
-                    .toObservable()
-                    .map(convertImageToByteArray(movieDb));
-        };
-    }
-
-    private Func1<ResponseBody, MovieDb> convertImageToByteArray(MovieDb movieDb) {
-        return responseBody -> {
-
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            InputStream inputStream = responseBody.byteStream();
-
-            try {
-                int current;
-                while ((current = inputStream.read()) != -1) {
-                    outputStream.write((byte) current);
-                }
-                outputStream.close();
-            } catch (IOException e) {
-                throw Exceptions.propagate(e);
-            }
-
-            movieDb.setPoster(outputStream.toByteArray());
-
-            try {
-                outputStream.close();
-            } catch (IOException e) {
-                throw Exceptions.propagate(e);
-            }
-
-            return movieDb;
-
-        };
-    }
+//    private Func1<ResponseBody, MovieDb> convertImageToByteArray(MovieDb movieDb) {
+//        return responseBody -> {
+//
+//            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+//            InputStream inputStream = responseBody.byteStream();
+//
+//            try {
+//                int current;
+//                while ((current = inputStream.read()) != -1) {
+//                    outputStream.write((byte) current);
+//                }
+//                outputStream.close();
+//            } catch (IOException e) {
+//                throw Exceptions.propagate(e);
+//            }
+//
+//            movieDb.setPoster(outputStream.toByteArray());
+//
+//            try {
+//                outputStream.close();
+//            } catch (IOException e) {
+//                throw Exceptions.propagate(e);
+//            }
+//
+//            return movieDb;
+//
+//        };
+//    }
 }

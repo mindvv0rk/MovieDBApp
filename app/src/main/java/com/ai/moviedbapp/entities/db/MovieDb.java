@@ -16,17 +16,16 @@ public class MovieDb extends RealmObject {
     private double mPopularity;
     private String mReleaseDate;
     private String mPosterPath;
-    private byte[] mPoster;
 
-    public static MovieDb createFromServerMovie(MovieResponse.Movie movie) {
+    public static MovieDb createFromServerMovie(MovieResponse.Movie movie, String posterPath) {
         return new MovieDb(movie.getId(), movie.getName(), movie.getDescription(),
-                movie.getVote(), movie.getPopularity(), movie.getReleaseDate(), movie.getPosterPath());
+                movie.getVote(), movie.getPopularity(), movie.getReleaseDate(), posterPath);
     }
 
     public static MovieDb createFormRealmObject(MovieDb realmMovie) {
         return new MovieDb(realmMovie.getId(), realmMovie.getName(),
                 realmMovie.getDescription(), realmMovie.getRating(), realmMovie.getPopularity(),
-                realmMovie.getReleaseDate(), realmMovie.getPosterPath(), realmMovie.getPoster());
+                realmMovie.getReleaseDate(), realmMovie.getPosterPath());
     }
 
     public MovieDb() {
@@ -51,15 +50,10 @@ public class MovieDb extends RealmObject {
         mPopularity = popularity;
         mReleaseDate = releaseDate;
         mPosterPath = posterPath;
-        mPoster = poster;
     }
 
     public String getPosterPath() {
         return mPosterPath;
-    }
-
-    public void setPoster(byte[] poster) {
-        mPoster = poster;
     }
 
     public long getId() {
@@ -86,7 +80,4 @@ public class MovieDb extends RealmObject {
         return mReleaseDate;
     }
 
-    public byte[] getPoster() {
-        return mPoster;
-    }
 }

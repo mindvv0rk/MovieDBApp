@@ -7,6 +7,7 @@ import com.ai.moviedbapp.databinding.ActivityMovieDetailsBinding;
 import com.ai.moviedbapp.entities.MovieDetails;
 import com.ai.moviedbapp.movies.MovieActivity;
 import com.ai.moviedbapp.presenter.MovieDetailsPresenter;
+import com.squareup.picasso.Picasso;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.ImageView;
 
 
 public class MovieDetailsActivity extends AppCompatActivity implements IMovieDetailsView {
@@ -83,8 +85,13 @@ public class MovieDetailsActivity extends AppCompatActivity implements IMovieDet
     public void showMovie(MovieDetails movie) {
         mBinding.setState(FormViewState.SUCCESS);
         mBinding.setMovie(movie);
-        byte[] posterBytes = movie.getPoster();
-        Bitmap poster = BitmapFactory.decodeByteArray(posterBytes, 0, posterBytes.length);
-        mBinding.poster.setImageBitmap(poster);
+        setPoster(movie.getPosterPath(), mBinding.poster);
+    }
+
+    private void setPoster(String posterPath, ImageView view) {
+        Picasso
+                .with(view.getContext())
+                .load(posterPath)
+                .into(view);
     }
 }

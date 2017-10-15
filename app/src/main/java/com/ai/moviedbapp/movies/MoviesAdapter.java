@@ -3,6 +3,7 @@ package com.ai.moviedbapp.movies;
 import com.ai.moviedbapp.R;
 import com.ai.moviedbapp.databinding.MovieItemBinding;
 import com.ai.moviedbapp.entities.Movie;
+import com.squareup.picasso.Picasso;
 
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
@@ -11,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,19 +61,16 @@ public final class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.Movi
         }
 
         public void setData(Movie movie, IMovieAdapterClickHandler handler) {
-
             mBinding.setHandler(handler);
             mBinding.setId(movie.getId());
-            Bitmap bitmap = decodeBitmap(movie.getPoster());
-            mBinding.poster.setImageBitmap(bitmap);
             mBinding.title.setText(movie.getName());
-
+            setPoster(movie.getPosterPath(), mBinding.poster);
         }
 
-        private Bitmap decodeBitmap(byte[] bytes) {
-            if (bytes != null)
-                return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-            return null;
+        private void setPoster(String posterPath, ImageView imageView) {
+            Picasso.with(imageView.getContext())
+                    .load(posterPath)
+                    .into(imageView);
         }
     }
 }

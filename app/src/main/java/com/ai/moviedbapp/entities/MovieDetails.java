@@ -9,20 +9,20 @@ public final class MovieDetails {
     private String mDescription;
     private double mRating;
     private String mReleaseDate;
-    private byte[] mPoster;
+    private String mPosterPath;
 
     public static MovieDetails createFromMovieDb(MovieDb movieDb) {
         return new MovieDetails(movieDb.getId(), movieDb.getName(), movieDb.getDescription(),
-                movieDb.getRating(), movieDb.getReleaseDate(), movieDb.getPoster());
+                movieDb.getRating(), movieDb.getReleaseDate(), movieDb.getPosterPath());
     }
 
-    public MovieDetails(long id, String name, String description, double rating, String releaseDate, byte[] poster) {
+    public MovieDetails(long id, String name, String description, double rating, String releaseDate, String posterPath) {
         mId = id;
         mName = name;
         mDescription = description;
         mRating = rating;
         mReleaseDate = releaseDate;
-        mPoster = poster;
+        mPosterPath = posterPath;
     }
 
     public long getId() {
@@ -45,7 +45,7 @@ public final class MovieDetails {
         return mReleaseDate;
     }
 
-    public byte[] getPoster() {
-        return mPoster;
+    public String getPosterPath() {
+        return mPosterPath;
     }
 }
