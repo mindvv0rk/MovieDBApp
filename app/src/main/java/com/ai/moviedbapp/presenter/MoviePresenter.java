@@ -61,7 +61,7 @@ public class MoviePresenter extends AbstractPresenter<IMovieView> {
 
     private void loadMovies() {
         getView().showLoading();
-        mConfigurationInteractor
+        mLoadingMovies = mConfigurationInteractor
                 .requestConfiguration()
                 .flatMap(s -> mMovieInteractor.loadMovies())
                 .subscribeOn(Schedulers.io())
@@ -74,6 +74,7 @@ public class MoviePresenter extends AbstractPresenter<IMovieView> {
                         },
                         throwable -> {
                             Log.e(TAG, throwable.getLocalizedMessage(), throwable);
+                            getView().showError("Human readable error message");
                         });
     }
 

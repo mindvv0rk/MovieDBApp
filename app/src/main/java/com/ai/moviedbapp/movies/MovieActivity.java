@@ -3,7 +3,7 @@ package com.ai.moviedbapp.movies;
 import com.ai.moviedbapp.R;
 import com.ai.moviedbapp.core.FormViewState;
 import com.ai.moviedbapp.core.PresenterManager;
-import com.ai.moviedbapp.databinding.ActivityMovieBinding;
+import com.ai.moviedbapp.databinding.ActivityMoviesBinding;
 import com.ai.moviedbapp.entities.Movie;
 import com.ai.moviedbapp.presenter.MoviePresenter;
 import com.ai.moviedbapp.view.GridSpaceItemDecorator;
@@ -12,7 +12,6 @@ import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 
 import java.util.List;
 
@@ -24,13 +23,13 @@ public class MovieActivity extends AppCompatActivity implements IMovieView {
 
     private int mPresenterId;
     private MoviePresenter mMoviePresenter;
-    private ActivityMovieBinding mBinding;
+    private ActivityMoviesBinding mBinding;
     private MoviesAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_movie);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_movies);
 
         mBinding.recycler.setLayoutManager(new GridLayoutManager(this, COLUMNS_COUNT));
         mAdapter = new MoviesAdapter();
@@ -72,7 +71,8 @@ public class MovieActivity extends AppCompatActivity implements IMovieView {
 
     @Override
     public void showError(String message) {
-
+        mBinding.setState(FormViewState.ERROR);
+        mBinding.error.setText(message);
     }
 
     @Override
