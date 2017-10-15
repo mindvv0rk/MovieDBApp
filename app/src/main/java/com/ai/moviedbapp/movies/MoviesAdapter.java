@@ -57,16 +57,10 @@ public final class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.Movi
         }
 
         public void setData(Movie movie) {
-            if (movie.getBitmap() != null) {
-                mBinding.poster.setImageBitmap(movie.getBitmap());
-            } else {
-                Bitmap bitmap = decodeBitmap(movie.getPoster());
-                if (bitmap != null) {
-//                    movie.setBitmap(bitmap);
-                    mBinding.poster.setImageBitmap(bitmap);
-                }
+            Bitmap bitmap = decodeBitmap(movie.getPoster());
+            if (bitmap != null) {
+                mBinding.poster.setImageBitmap(bitmap);
             }
-
             mBinding.title.setText(movie.getName());
 
         }
