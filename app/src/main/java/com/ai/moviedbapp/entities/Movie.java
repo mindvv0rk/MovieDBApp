@@ -9,6 +9,7 @@ public final class Movie {
     private long mId;
     private String mName;
     private byte[] mPoster;
+    private Bitmap mBitmap;
 
     public Movie(long id, String name, byte[] poster) {
         mId = id;
@@ -18,6 +19,14 @@ public final class Movie {
 
     public static Movie createFromDbo(MovieDb movieDb) {
         return new Movie(movieDb.getId(), movieDb.getName(), movieDb.getPoster());
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        mBitmap = bitmap;
+    }
+
+    public Bitmap getBitmap() {
+        return mBitmap;
     }
 
     public long getId() {

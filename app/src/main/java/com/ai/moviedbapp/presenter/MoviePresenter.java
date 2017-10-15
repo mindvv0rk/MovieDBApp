@@ -10,12 +10,14 @@ import com.ai.moviedbapp.movies.IMovieView;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Single;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -30,14 +32,25 @@ public class MoviePresenter extends AbstractPresenter<IMovieView> {
     @Inject
     IMovieInteractor mMovieInteractor;
 
+    private List<Movie> mMovies;
+    private Subscription mLoadingMovies;
+
     public MoviePresenter() {
         Injector.getInstance().initMovieComponent().inject(this);
+        mMovies = new ArrayList<>();
     }
 
     @Override
     protected void onViewAttached(@NonNull IMovieView view) {
         super.onViewAttached(view);
-        loadMovies();
+
+        if (mLoadingMovies != null && !mLoadingMovies.isUnsubscribed()) {
+            getView().showLoading();
+        } else if (mMovies.isEmpty()) {
+            loadMovies();
+        } else {
+            getView().showData(mMovies);
+        }
     }
 
     @Override
@@ -55,8 +68,9 @@ public class MoviePresenter extends AbstractPresenter<IMovieView> {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         movies -> {
-                            getView().showData();
-                            Log.i(TAG, "Size = " + movies.size());
+                            mMovies.clear();
+                            mMovies.addAll(movies);
+                            getView().showData(mMovies);
                         },
                         throwable -> {
                             Log.e(TAG, throwable.getLocalizedMessage(), throwable);
