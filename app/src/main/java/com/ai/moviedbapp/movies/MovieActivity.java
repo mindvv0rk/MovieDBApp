@@ -9,17 +9,20 @@ import com.ai.moviedbapp.entities.Sort;
 import com.ai.moviedbapp.movies.details.MovieDetailsActivity;
 import com.ai.moviedbapp.presenter.MoviePresenter;
 import com.ai.moviedbapp.view.GridSpaceItemDecorator;
+import com.paginate.Paginate;
+import com.paginate.recycler.LoadingListItemSpanLookup;
 
 import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
+import android.util.Log;
 import android.view.View;
 
 import java.util.List;
 
 public class MovieActivity extends AppCompatActivity implements IMovieView, IMovieAdapterClickHandler,
-        IRetryable, ISortClickHandler {
+        IRetryable, ISortClickHandler, Paginate.Callbacks {
 
     private static final String TAG = MovieActivity.class.getSimpleName();
 
@@ -30,6 +33,9 @@ public class MovieActivity extends AppCompatActivity implements IMovieView, IMov
     private ActivityMoviesBinding mBinding;
     private MoviesAdapter mAdapter;
 
+    private boolean isLoading;
+    private boolean isLoadedAllItems;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,18 +43,29 @@ public class MovieActivity extends AppCompatActivity implements IMovieView, IMov
         mBinding.setRetryHandler(this);
         mBinding.setSortHandler(this);
 
+        initRecycler();
+
+        mPresenterId = MovieActivity.class.getSimpleName().hashCode();
+        mMoviePresenter = PresenterManager.getPresenter(mPresenterId, MoviePresenter::new);
+    }
+
+    private void initRecycler() {
         mBinding.recycler.setLayoutManager(new GridLayoutManager(this, COLUMNS_COUNT));
         mAdapter = new MoviesAdapter(this);
         mBinding.recycler.setAdapter(mAdapter);
 
+        Paginate.with(mBinding.recycler, this)
+                .setLoadingTriggerThreshold(6)
+                .addLoadingListItem(true)
+                .setLoadingListItemSpanSizeLookup(() -> COLUMNS_COUNT)
+                .build();
+
+
         int spaceSize = getResources().getDimensionPixelSize(R.dimen.grid_items_space);
         GridSpaceItemDecorator decorator = new GridSpaceItemDecorator(COLUMNS_COUNT, spaceSize, true);
         mBinding.recycler.addItemDecoration(decorator);
-
-        mPresenterId = MovieActivity.class.getSimpleName().hashCode();
-        mMoviePresenter = PresenterManager.getPresenter(mPresenterId, MoviePresenter::new);
-
     }
+
 
     @Override
     protected void onStart() {
@@ -90,6 +107,25 @@ public class MovieActivity extends AppCompatActivity implements IMovieView, IMov
     }
 
     @Override
+    public void loadedAllItems() {
+        isLoadedAllItems = true;
+    }
+
+    @Override
+    public void showLoadingNextPage() {
+        isLoading = true;
+    }
+
+    @Override
+    public void showNextPage(List<Movie> movies) {
+        if (movies != null) {
+            mAdapter.setNextMovies(movies);
+            mAdapter.notifyItemRangeInserted(mAdapter.getItemCount(), movies.size());
+        }
+        isLoading = false;
+    }
+
+    @Override
     public void onMovieClick(View view, long movieId) {
         MovieDetailsActivity.start(this, movieId);
     }
@@ -102,5 +138,20 @@ public class MovieActivity extends AppCompatActivity implements IMovieView, IMov
     @Override
     public void onSortButtonClick(View view) {
         mMoviePresenter.changeSortType();
+    }
+
+    @Override
+    public void onLoadMore() {
+        if (mMoviePresenter != null) mMoviePresenter.loadNextPage();
+    }
+
+    @Override
+    public boolean isLoading() {
+        return isLoading;
+    }
+
+    @Override
+    public boolean hasLoadedAllItems() {
+        return isLoadedAllItems;
     }
 }

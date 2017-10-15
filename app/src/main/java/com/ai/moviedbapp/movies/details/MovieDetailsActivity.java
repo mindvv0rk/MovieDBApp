@@ -92,6 +92,8 @@ public class MovieDetailsActivity extends AppCompatActivity implements IMovieDet
         Picasso
                 .with(view.getContext())
                 .load(posterPath)
+                .placeholder(R.mipmap.ic_launcher)
+                .error(R.mipmap.ic_launcher)
                 .into(view);
     }
 }

@@ -22,21 +22,21 @@ public class DbRepository implements IDbRepository {
     private static final String RATING_FIELD = "mRating";
 
     @Override
-    public MovieDb insertOrUpdateMovie(MovieDb movie) {
+    public Movie insertOrUpdateMovie(MovieDb movie) {
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
         MovieDb realmMovie = realm.copyToRealmOrUpdate(movie);
         realm.commitTransaction();
 
-        movie = MovieDb.createFormRealmObject(realmMovie);
+        Movie presentableMovie = Movie.createFromDbo(realmMovie);
 
         realm.close();
 
-        return movie;
+        return presentableMovie;
     }
 
     @Override
-    public Single<List<Movie>> getMovies(com.ai.moviedbapp.entities.Sort sort, int page) {
+    public Single<List<Movie>> getMovies(com.ai.moviedbapp.entities.Sort sort, int page, int pageSize) {
         return Single
                 .create(singleSubscriber -> {
                     Realm realm = Realm.getDefaultInstance();
@@ -44,15 +44,30 @@ public class DbRepository implements IDbRepository {
                     RealmResults<MovieDb> results = realm
                             .where(MovieDb.class)
                             .findAllSorted(fieldForSort, Sort.DESCENDING);
-                    
-                    List<Movie> movies = new ArrayList<>(results.size());
-                    for (MovieDb movieDb : results) {
+
+                    List<MovieDb> pageMovies = results.subList(
+                            getStartPageIndex(page, pageSize),
+                            getEndPageIndex(page, pageSize, results.size()));
+                    List<Movie> movies = new ArrayList<>(pageMovies.size());
+                    for (MovieDb movieDb : pageMovies) {
                         Movie movie = Movie.createFromDbo(movieDb);
                         movies.add(movie);
                     }
 
+                    realm.close();
+
                     singleSubscriber.onSuccess(movies);
                 });
+    }
+
+    private int getStartPageIndex(int page, int pageSize) {
+        return pageSize * (page -1);
+    }
+
+    private int getEndPageIndex(int page, int pageSize, int totalSize) {
+        int result = pageSize * page;
+        if (result > totalSize) result = totalSize - 1;
+        return result;
     }
 
     @Override
@@ -68,6 +83,7 @@ public class DbRepository implements IDbRepository {
             }
 
             MovieDetails movieDetails = MovieDetails.createFromMovieDb(realmMovieDb);
+            realm.close();
             singleSubscriber.onSuccess(movieDetails);
         });
     }

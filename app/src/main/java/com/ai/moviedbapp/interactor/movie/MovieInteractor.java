@@ -31,6 +31,8 @@ import rx.schedulers.Schedulers;
 
 public class MovieInteractor implements IMovieInteractor {
 
+    private static final int PAGE_SIZE = 20;
+
     private IMovieApi mMovieApi;
     private IImageApi mImageApi;
     private IPreferencesRepository mPreferencesRepository;
@@ -61,66 +63,34 @@ public class MovieInteractor implements IMovieInteractor {
                     .flatMapIterable(MovieResponse::getMovies)
                     .observeOn(Schedulers.computation())
                     .map(saveMovieToDb())
-//                    .observeOn(Schedulers.io())
-//                    .flatMap(loadImage())
-//                    .observeOn(Schedulers.computation())
-//                    .map(movieDb -> mDbRepository.insertOrUpdateMovie(movieDb))
-                    .map(Movie::createFromDbo)
                     .toList()
                     .toSingle());
         } else {
-            return mDbRepository.getMovies(sort, 1);
+            return mDbRepository.getMovies(sort, 1, PAGE_SIZE);
         }
     }
 
-    private Func1<MovieResponse.Movie, MovieDb> saveMovieToDb() {
+    @Override
+    public Single<List<Movie>> loadMoreMovies(Sort sort, int page) {
+        if (mNetworkState.hasNetworkConnection()) {
+            return mMovieApi
+                    .getMovies(NetworkModuleFactory.TOKEN, sort.getParamForCurrentSort(), page)
+                    .toObservable()
+                    .flatMapIterable(MovieResponse::getMovies)
+                    .observeOn(Schedulers.computation())
+                    .map(saveMovieToDb())
+                    .toList()
+                    .toSingle();
+        } else {
+            return mDbRepository.getMovies(sort, page, PAGE_SIZE);
+        }
+    }
+
+    private Func1<MovieResponse.Movie, Movie> saveMovieToDb() {
         return movie -> {
             String posterUrl = mPreferencesRepository.getImageBaseUrl() + movie.getPosterPath();
             MovieDb movieDb = MovieDb.createFromServerMovie(movie, posterUrl);
             return mDbRepository.insertOrUpdateMovie(movieDb);
         };
     }
-
-//    private Func1<MovieDb, Observable<MovieDb>> loadImage() {
-//        return movieDb -> {
-//            if (TextUtils.isEmpty(movieDb.getPosterPath())) {
-//                return Observable.just(movieDb);
-//            }
-//
-//            String posterUrl = mPreferencesRepository.getImageBaseUrl() + movieDb.getPosterPath();
-//            return mImageApi
-//                    .getImage(posterUrl)
-//                    .toObservable()
-//                    .map(convertImageToByteArray(movieDb));
-//        };
-//    }
-
-//    private Func1<ResponseBody, MovieDb> convertImageToByteArray(MovieDb movieDb) {
-//        return responseBody -> {
-//
-//            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-//            InputStream inputStream = responseBody.byteStream();
-//
-//            try {
-//                int current;
-//                while ((current = inputStream.read()) != -1) {
-//                    outputStream.write((byte) current);
-//                }
-//                outputStream.close();
-//            } catch (IOException e) {
-//                throw Exceptions.propagate(e);
-//            }
-//
-//            movieDb.setPoster(outputStream.toByteArray());
-//
-//            try {
-//                outputStream.close();
-//            } catch (IOException e) {
-//                throw Exceptions.propagate(e);
-//            }
-//
-//            return movieDb;
-//
-//        };
-//    }
 }

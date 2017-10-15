@@ -11,9 +11,9 @@ import rx.Single;
 
 public interface IDbRepository {
 
-    MovieDb insertOrUpdateMovie(MovieDb movie);
+    Movie insertOrUpdateMovie(MovieDb movie);
 
-    Single<List<Movie>> getMovies(Sort sort, int page);
+    Single<List<Movie>> getMovies(Sort sort, int page, int pageSize);
 
     Single<MovieDetails> getMovieById(long id);
 }

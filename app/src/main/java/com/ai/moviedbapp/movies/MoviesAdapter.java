@@ -32,6 +32,10 @@ public final class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.Movi
         mMovies.addAll(movies);
     }
 
+    public void setNextMovies(List<Movie> movies) {
+        mMovies.addAll(movies);
+    }
+
     @Override
     public MoviesAdapter.MovieViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
@@ -70,6 +74,8 @@ public final class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.Movi
         private void setPoster(String posterPath, ImageView imageView) {
             Picasso.with(imageView.getContext())
                     .load(posterPath)
+                    .placeholder(R.mipmap.ic_launcher)
+                    .error(R.mipmap.ic_launcher)
                     .into(imageView);
         }
     }

@@ -10,4 +10,6 @@ import rx.Single;
 public interface IMovieInteractor {
 
     Single<List<Movie>> loadMovies(Sort sort);
+
+    Single<List<Movie>> loadMoreMovies(Sort sort, int page);
 }

@@ -26,18 +26,23 @@ import rx.schedulers.Schedulers;
 public class MoviePresenter extends AbstractPresenter<IMovieView> {
 
     private static final String TAG = MoviePresenter.class.getSimpleName();
+    private static final int MAX_PAGE = 1000;
 
     @Inject
     IMovieInteractor mMovieInteractor;
 
     private List<Movie> mMovies;
     private Subscription mLoadingMovies;
+    private Subscription mLoadingNextPage;
     private Sort mSort;
+    private boolean isLoadedAllItems;
+    private int mCurrentPage;
 
     public MoviePresenter() {
         Injector.getInstance().initMovieComponent().inject(this);
         mMovies = new ArrayList<>();
         mSort = new Sort();
+        mCurrentPage = 1;
         loadMovies(mSort);
     }
 
@@ -48,7 +53,39 @@ public class MoviePresenter extends AbstractPresenter<IMovieView> {
 
     public void reloadMovies() {
         mMovies.clear();
+        isLoadedAllItems = false;
+        mLoadingNextPage.unsubscribe();
+        mLoadingMovies.unsubscribe();
+        mCurrentPage = 1;
         loadMovies(mSort);
+    }
+
+    public void loadNextPage() {
+        if (mLoadingNextPage != null && !mLoadingNextPage.isUnsubscribed()) return;
+
+        if (mCurrentPage >= MAX_PAGE) {
+            isLoadedAllItems = true;
+            if (getView() != null) getView().loadedAllItems();
+        }
+
+        mCurrentPage++;
+        if (getView() != null) getView().showLoadingNextPage();
+
+        mLoadingNextPage = mMovieInteractor
+                .loadMoreMovies(mSort, mCurrentPage)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        movies -> {
+//                            if (movies.size() == 0) isLoadedAllItems = true;
+
+                            mMovies.addAll(movies);
+                            if (getView() != null) getView().showNextPage(movies);
+                        },
+                        throwable -> {
+                            Log.e(TAG, throwable.getLocalizedMessage(), throwable);
+                            if (getView() != null) getView().showNextPage(null);
+                        });
     }
 
     @Override
@@ -61,6 +98,12 @@ public class MoviePresenter extends AbstractPresenter<IMovieView> {
             loadMovies(mSort);
         } else {
             getView().showData(mMovies, mSort);
+        }
+
+        if (mLoadingNextPage != null && !mLoadingNextPage.isUnsubscribed()) {
+            getView().showLoadingNextPage();
+        } else if (isLoadedAllItems) {
+            getView().loadedAllItems();
         }
     }
 
