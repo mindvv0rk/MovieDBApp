@@ -11,6 +11,10 @@
         <variable
             name="state"
             type="int" />
+
+        <variable
+            name="retryHandler"
+            type="com.ai.moviedbapp.movies.IRetryable"/>
     </data>
 
     <FrameLayout
@@ -50,6 +54,7 @@
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:onClick="@{retryHandler.onRetryClick}"
                 android:text="@string/retry_button_title"/>
 
         </LinearLayout>

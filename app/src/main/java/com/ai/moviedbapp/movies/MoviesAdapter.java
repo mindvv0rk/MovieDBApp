@@ -18,9 +18,11 @@ import java.util.List;
 public final class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewHolder> {
 
     private List<Movie> mMovies;
+    private MovieAdapterClickHandler mClickHandler;
 
-    public MoviesAdapter() {
+    public MoviesAdapter(MovieAdapterClickHandler handler) {
         mMovies = new ArrayList<>();
+        mClickHandler = handler;
     }
 
     public void setMovies(List<Movie> movies) {
@@ -38,7 +40,7 @@ public final class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.Movi
     @Override
     public void onBindViewHolder(MoviesAdapter.MovieViewHolder holder, int position) {
         Movie movie = mMovies.get(position);
-        holder.setData(movie);
+        holder.setData(movie, mClickHandler);
     }
 
     @Override
@@ -56,7 +58,9 @@ public final class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.Movi
             mBinding = DataBindingUtil.bind(itemView);
         }
 
-        public void setData(Movie movie) {
+        public void setData(Movie movie, MovieAdapterClickHandler handler) {
+            mBinding.setHandler(handler);
+            mBinding.setId(movie.getId());
             Bitmap bitmap = decodeBitmap(movie.getPoster());
             if (bitmap != null) {
                 mBinding.poster.setImageBitmap(bitmap);

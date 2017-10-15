@@ -38,6 +38,12 @@ public class MoviePresenter extends AbstractPresenter<IMovieView> {
     public MoviePresenter() {
         Injector.getInstance().initMovieComponent().inject(this);
         mMovies = new ArrayList<>();
+        loadMovies();
+    }
+
+    public void reloadMovies() {
+        mMovies.clear();
+        loadMovies();
     }
 
     @Override
@@ -60,7 +66,7 @@ public class MoviePresenter extends AbstractPresenter<IMovieView> {
     }
 
     private void loadMovies() {
-        getView().showLoading();
+        if (getView() != null) getView().showLoading();
         mLoadingMovies = mConfigurationInteractor
                 .requestConfiguration()
                 .flatMap(s -> mMovieInteractor.loadMovies())

@@ -5,6 +5,7 @@ import com.ai.moviedbapp.core.FormViewState;
 import com.ai.moviedbapp.core.PresenterManager;
 import com.ai.moviedbapp.databinding.ActivityMoviesBinding;
 import com.ai.moviedbapp.entities.Movie;
+import com.ai.moviedbapp.movies.details.MovieDetailsActivity;
 import com.ai.moviedbapp.presenter.MoviePresenter;
 import com.ai.moviedbapp.view.GridSpaceItemDecorator;
 
@@ -12,10 +13,11 @@ import android.databinding.DataBindingUtil;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
+import android.view.View;
 
 import java.util.List;
 
-public class MovieActivity extends AppCompatActivity implements IMovieView {
+public class MovieActivity extends AppCompatActivity implements IMovieView, MovieAdapterClickHandler, IRetryable {
 
     private static final String TAG = MovieActivity.class.getSimpleName();
 
@@ -30,9 +32,10 @@ public class MovieActivity extends AppCompatActivity implements IMovieView {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_movies);
+        mBinding.setRetryHandler(this);
 
         mBinding.recycler.setLayoutManager(new GridLayoutManager(this, COLUMNS_COUNT));
-        mAdapter = new MoviesAdapter();
+        mAdapter = new MoviesAdapter(this);
         mBinding.recycler.setAdapter(mAdapter);
 
         int spaceSize = getResources().getDimensionPixelSize(R.dimen.grid_items_space);
@@ -80,5 +83,15 @@ public class MovieActivity extends AppCompatActivity implements IMovieView {
         mAdapter.setMovies(movies);
         mAdapter.notifyDataSetChanged();
         mBinding.setState(FormViewState.SUCCESS);
+    }
+
+    @Override
+    public void onMovieClick(View view, long movieId) {
+        MovieDetailsActivity.start(this, movieId);
+    }
+
+    @Override
+    public void onRetryClick(View view) {
+        mMoviePresenter.reloadMovies();
     }
 }

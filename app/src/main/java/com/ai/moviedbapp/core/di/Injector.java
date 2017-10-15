@@ -2,12 +2,15 @@ package com.ai.moviedbapp.core.di;
 
 import com.ai.moviedbapp.core.di.components.ApplicationComponent;
 import com.ai.moviedbapp.core.di.components.MovieComponent;
+import com.ai.moviedbapp.core.di.components.MovieDetailsComponent;
+import com.ai.moviedbapp.core.di.modules.MovieDetailsModule;
 import com.ai.moviedbapp.core.di.modules.MovieModule;
 
 public class Injector {
 
     private final ApplicationComponent mAppComponent;
     private MovieComponent mMovieComponent;
+    private MovieDetailsComponent mMovieDetailsComponent;
     private static Injector sInstance;
 
     private Injector(ApplicationComponent applicationComponent) {
@@ -37,5 +40,18 @@ public class Injector {
 
     public void destroyMovieComponent() {
         mMovieComponent = null;
+    }
+
+    public MovieDetailsComponent initMovieDetailsComponent() {
+        mMovieDetailsComponent = mAppComponent.plusMovieDetailsComponent(new MovieDetailsModule());
+        return mMovieDetailsComponent;
+    }
+
+    public MovieDetailsComponent getMovieDetailsComponent() {
+        return mMovieDetailsComponent;
+    }
+
+    public void destroyMovieDetailsComponent() {
+        mMovieDetailsComponent = null;
     }
 }

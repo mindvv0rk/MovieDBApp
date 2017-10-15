@@ -1,10 +1,13 @@
 package com.ai.moviedbapp.interactor.movie.details;
 
+import com.ai.moviedbapp.entities.MovieDetails;
 import com.ai.moviedbapp.repository.IDbRepository;
 
 import javax.inject.Inject;
 
-class MovieDetailsInteractor implements IMovieDetailsInteractor {
+import rx.Single;
+
+public class MovieDetailsInteractor implements IMovieDetailsInteractor {
 
     private IDbRepository mDbRepository;
 
@@ -14,4 +17,9 @@ class MovieDetailsInteractor implements IMovieDetailsInteractor {
     }
 
 
+    @Override
+    public Single<MovieDetails> getMovieDetails(long id) {
+        return mDbRepository
+                .getMovieById(id);
+    }
 }
