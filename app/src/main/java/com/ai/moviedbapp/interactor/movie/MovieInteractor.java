@@ -6,6 +6,7 @@ import com.ai.moviedbapp.core.network.NetworkModuleFactory;
 import com.ai.moviedbapp.entities.Movie;
 import com.ai.moviedbapp.entities.db.MovieDb;
 import com.ai.moviedbapp.entities.responses.MovieResponse;
+import com.ai.moviedbapp.interactor.INetworkState;
 import com.ai.moviedbapp.repository.IDbRepository;
 import com.ai.moviedbapp.repository.IPreferencesRepository;
 
@@ -33,14 +34,17 @@ public class MovieInteractor implements IMovieInteractor {
     private IImageApi mImageApi;
     private IPreferencesRepository mPreferencesRepository;
     private IDbRepository mDbRepository;
+    private INetworkState mNetworkState;
 
     @Inject
     public MovieInteractor(IMovieApi movieApi, IImageApi imageApi,
-                           IPreferencesRepository preferencesRepository, IDbRepository dbRepository) {
+                           IPreferencesRepository preferencesRepository, IDbRepository dbRepository,
+                           INetworkState networkState) {
         mMovieApi = movieApi;
         mImageApi = imageApi;
         mPreferencesRepository = preferencesRepository;
         mDbRepository = dbRepository;
+        mNetworkState = networkState;
     }
 
     @Override
