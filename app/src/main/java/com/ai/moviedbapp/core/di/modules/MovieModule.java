@@ -42,9 +42,10 @@ public class MovieModule {
             IImageApi imageApi,
             IPreferencesRepository preferencesRepository,
             IDbRepository dbRepository,
-            INetworkState networkState) {
+            INetworkState networkState,
+            IConfigurationInteractor configurationInteractor) {
         return new MovieInteractor(movieApi, imageApi, preferencesRepository, dbRepository,
-                networkState);
+                networkState, configurationInteractor);
     }
 
 

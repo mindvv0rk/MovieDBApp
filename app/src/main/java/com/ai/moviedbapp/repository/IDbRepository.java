@@ -1,5 +1,6 @@
 package com.ai.moviedbapp.repository;
 
+import com.ai.moviedbapp.entities.Movie;
 import com.ai.moviedbapp.entities.MovieDetails;
 import com.ai.moviedbapp.entities.db.MovieDb;
 
@@ -11,7 +12,7 @@ public interface IDbRepository {
 
     MovieDb insertOrUpdateMovie(MovieDb movie);
 
-    List<MovieDb> getMovies(int page);
+    Single<List<Movie>> getMovies(int page);
 
     Single<MovieDetails> getMovieById(long id);
 }

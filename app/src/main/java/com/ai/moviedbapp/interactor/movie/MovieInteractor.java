@@ -7,6 +7,7 @@ import com.ai.moviedbapp.entities.Movie;
 import com.ai.moviedbapp.entities.db.MovieDb;
 import com.ai.moviedbapp.entities.responses.MovieResponse;
 import com.ai.moviedbapp.interactor.INetworkState;
+import com.ai.moviedbapp.interactor.configuration.IConfigurationInteractor;
 import com.ai.moviedbapp.repository.IDbRepository;
 import com.ai.moviedbapp.repository.IPreferencesRepository;
 
@@ -35,33 +36,41 @@ public class MovieInteractor implements IMovieInteractor {
     private IPreferencesRepository mPreferencesRepository;
     private IDbRepository mDbRepository;
     private INetworkState mNetworkState;
+    private IConfigurationInteractor mConfigurationInteractor;
 
     @Inject
     public MovieInteractor(IMovieApi movieApi, IImageApi imageApi,
                            IPreferencesRepository preferencesRepository, IDbRepository dbRepository,
-                           INetworkState networkState) {
+                           INetworkState networkState, IConfigurationInteractor configurationInteractor) {
         mMovieApi = movieApi;
         mImageApi = imageApi;
         mPreferencesRepository = preferencesRepository;
         mDbRepository = dbRepository;
         mNetworkState = networkState;
+        mConfigurationInteractor = configurationInteractor;
     }
 
     @Override
     public Single<List<Movie>> loadMovies() {
-        return mMovieApi
-                .getMovies(NetworkModuleFactory.TOKEN, POPULAR_SORT, 1)
-                .toObservable()
-                .flatMapIterable(MovieResponse::getMovies)
-                .observeOn(Schedulers.computation())
-                .map(saveMovieToDb())
-                .observeOn(Schedulers.io())
-                .flatMap(loadImage())
-                .observeOn(Schedulers.computation())
-                .map(movieDb -> mDbRepository.insertOrUpdateMovie(movieDb))
-                .map(Movie::createFromDbo)
-                .toList()
-                .toSingle();
+        if (mNetworkState.hasNetworkConnection()) {
+            return mConfigurationInteractor
+                    .requestConfiguration()
+                    .flatMap(s -> mMovieApi
+                    .getMovies(NetworkModuleFactory.TOKEN, POPULAR_SORT, 1)
+                    .toObservable()
+                    .flatMapIterable(MovieResponse::getMovies)
+                    .observeOn(Schedulers.computation())
+                    .map(saveMovieToDb())
+                    .observeOn(Schedulers.io())
+                    .flatMap(loadImage())
+                    .observeOn(Schedulers.computation())
+                    .map(movieDb -> mDbRepository.insertOrUpdateMovie(movieDb))
+                    .map(Movie::createFromDbo)
+                    .toList()
+                    .toSingle());
+        } else {
+            return mDbRepository.getMovies(1);
+        }
     }
 
     private Func1<MovieResponse.Movie, MovieDb> saveMovieToDb() {

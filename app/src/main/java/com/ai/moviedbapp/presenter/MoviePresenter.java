@@ -27,9 +27,6 @@ public class MoviePresenter extends AbstractPresenter<IMovieView> {
     private static final String TAG = MoviePresenter.class.getSimpleName();
 
     @Inject
-    IConfigurationInteractor mConfigurationInteractor;
-
-    @Inject
     IMovieInteractor mMovieInteractor;
 
     private List<Movie> mMovies;
@@ -67,9 +64,7 @@ public class MoviePresenter extends AbstractPresenter<IMovieView> {
 
     private void loadMovies() {
         if (getView() != null) getView().showLoading();
-        mLoadingMovies = mConfigurationInteractor
-                .requestConfiguration()
-                .flatMap(s -> mMovieInteractor.loadMovies())
+        mLoadingMovies = mMovieInteractor.loadMovies()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
