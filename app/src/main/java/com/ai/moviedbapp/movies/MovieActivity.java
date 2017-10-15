@@ -5,6 +5,7 @@ import com.ai.moviedbapp.core.FormViewState;
 import com.ai.moviedbapp.core.PresenterManager;
 import com.ai.moviedbapp.databinding.ActivityMoviesBinding;
 import com.ai.moviedbapp.entities.Movie;
+import com.ai.moviedbapp.entities.Sort;
 import com.ai.moviedbapp.movies.details.MovieDetailsActivity;
 import com.ai.moviedbapp.presenter.MoviePresenter;
 import com.ai.moviedbapp.view.GridSpaceItemDecorator;
@@ -17,7 +18,8 @@ import android.view.View;
 
 import java.util.List;
 
-public class MovieActivity extends AppCompatActivity implements IMovieView, MovieAdapterClickHandler, IRetryable {
+public class MovieActivity extends AppCompatActivity implements IMovieView, IMovieAdapterClickHandler,
+        IRetryable, ISortClickHandler {
 
     private static final String TAG = MovieActivity.class.getSimpleName();
 
@@ -33,6 +35,7 @@ public class MovieActivity extends AppCompatActivity implements IMovieView, Movi
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_movies);
         mBinding.setRetryHandler(this);
+        mBinding.setSortHandler(this);
 
         mBinding.recycler.setLayoutManager(new GridLayoutManager(this, COLUMNS_COUNT));
         mAdapter = new MoviesAdapter(this);
@@ -79,9 +82,10 @@ public class MovieActivity extends AppCompatActivity implements IMovieView, Movi
     }
 
     @Override
-    public void showData(List<Movie> movies) {
+    public void showData(List<Movie> movies, Sort sort) {
         mAdapter.setMovies(movies);
         mAdapter.notifyDataSetChanged();
+        mBinding.setSortType(sort.getCurrentSort());
         mBinding.setState(FormViewState.SUCCESS);
     }
 
@@ -93,5 +97,10 @@ public class MovieActivity extends AppCompatActivity implements IMovieView, Movi
     @Override
     public void onRetryClick(View view) {
         mMoviePresenter.reloadMovies();
+    }
+
+    @Override
+    public void onSortButtonClick(View view) {
+        mMoviePresenter.changeSortType();
     }
 }

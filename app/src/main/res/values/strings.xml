@@ -3,4 +3,6 @@
     <string name="retry_button_title">Retry</string>
     <string name="movie_details_rating_title">Rating:</string>
     <string name="movie_details_release_date_title">Release date:</string>
+    <string name="sort_by_popularity">Sort by popularity</string>
+    <string name="sort_by_rating">Sort by rating</string>
 </resources>

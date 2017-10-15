@@ -18,9 +18,9 @@ import java.util.List;
 public final class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewHolder> {
 
     private List<Movie> mMovies;
-    private MovieAdapterClickHandler mClickHandler;
+    private IMovieAdapterClickHandler mClickHandler;
 
-    public MoviesAdapter(MovieAdapterClickHandler handler) {
+    public MoviesAdapter(IMovieAdapterClickHandler handler) {
         mMovies = new ArrayList<>();
         mClickHandler = handler;
     }
@@ -58,19 +58,20 @@ public final class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.Movi
             mBinding = DataBindingUtil.bind(itemView);
         }
 
-        public void setData(Movie movie, MovieAdapterClickHandler handler) {
+        public void setData(Movie movie, IMovieAdapterClickHandler handler) {
+
             mBinding.setHandler(handler);
             mBinding.setId(movie.getId());
             Bitmap bitmap = decodeBitmap(movie.getPoster());
-            if (bitmap != null) {
-                mBinding.poster.setImageBitmap(bitmap);
-            }
+            mBinding.poster.setImageBitmap(bitmap);
             mBinding.title.setText(movie.getName());
 
         }
 
         private Bitmap decodeBitmap(byte[] bytes) {
-            return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            if (bytes != null)
+                return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+            return null;
         }
     }
 }

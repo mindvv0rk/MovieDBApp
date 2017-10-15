@@ -4,12 +4,15 @@ import com.ai.moviedbapp.core.network.IImageApi;
 import com.ai.moviedbapp.core.network.IMovieApi;
 import com.ai.moviedbapp.core.network.NetworkModuleFactory;
 import com.ai.moviedbapp.entities.Movie;
+import com.ai.moviedbapp.entities.Sort;
 import com.ai.moviedbapp.entities.db.MovieDb;
 import com.ai.moviedbapp.entities.responses.MovieResponse;
 import com.ai.moviedbapp.interactor.INetworkState;
 import com.ai.moviedbapp.interactor.configuration.IConfigurationInteractor;
 import com.ai.moviedbapp.repository.IDbRepository;
 import com.ai.moviedbapp.repository.IPreferencesRepository;
+
+import android.text.TextUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,9 +30,6 @@ import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class MovieInteractor implements IMovieInteractor {
-
-    private static final String POPULAR_SORT = "popularity.desc";
-    private static final String TOP_RATED_SORT = "vote_average.desc";
 
     private IMovieApi mMovieApi;
     private IImageApi mImageApi;
@@ -51,12 +51,12 @@ public class MovieInteractor implements IMovieInteractor {
     }
 
     @Override
-    public Single<List<Movie>> loadMovies() {
+    public Single<List<Movie>> loadMovies(Sort sort) {
         if (mNetworkState.hasNetworkConnection()) {
             return mConfigurationInteractor
                     .requestConfiguration()
                     .flatMap(s -> mMovieApi
-                    .getMovies(NetworkModuleFactory.TOKEN, POPULAR_SORT, 1)
+                    .getMovies(NetworkModuleFactory.TOKEN, sort.getParamForCurrentSort(), 1)
                     .toObservable()
                     .flatMapIterable(MovieResponse::getMovies)
                     .observeOn(Schedulers.computation())
@@ -69,7 +69,7 @@ public class MovieInteractor implements IMovieInteractor {
                     .toList()
                     .toSingle());
         } else {
-            return mDbRepository.getMovies(1);
+            return mDbRepository.getMovies(sort, 1);
         }
     }
 
@@ -82,6 +82,10 @@ public class MovieInteractor implements IMovieInteractor {
 
     private Func1<MovieDb, Observable<MovieDb>> loadImage() {
         return movieDb -> {
+            if (TextUtils.isEmpty(movieDb.getPosterPath())) {
+                return Observable.just(movieDb);
+            }
+
             String posterUrl = mPreferencesRepository.getImageBaseUrl() + movieDb.getPosterPath();
             return mImageApi
                     .getImage(posterUrl)

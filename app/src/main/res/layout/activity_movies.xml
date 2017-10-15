@@ -5,28 +5,45 @@
     <data>
 
         <import type="android.view.View" />
-
         <import type="com.ai.moviedbapp.core.FormViewState" />
+        <import type="com.ai.moviedbapp.entities.Sort.SortType" />
 
         <variable
             name="state"
             type="int" />
 
         <variable
+            name="sortType"
+            type="int"/>
+
+        <variable
             name="retryHandler"
-            type="com.ai.moviedbapp.movies.IRetryable"/>
+            type="com.ai.moviedbapp.movies.IRetryable" />
+
+        <variable
+            name="sortHandler"
+            type="com.ai.moviedbapp.movies.ISortClickHandler" />
     </data>
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         tools:context="com.ai.moviedbapp.movies.MovieActivity">
 
         <ProgressBar
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
             android:visibility="@{state == FormViewState.LOADING ? View.VISIBLE : View.GONE}" />
+
+        <Button
+            android:id="@+id/sort"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{sortType == SortType.POPULARITY ? @string/sort_by_rating : @string/sort_by_popularity}"
+            android:onClick="@{sortHandler.onSortButtonClick}"
+            android:visibility="@{state == FormViewState.SUCCESS ? View.VISIBLE : View.GONE}" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler"
@@ -36,13 +53,13 @@
 
 
         <LinearLayout
-            android:visibility="@{state == FormViewState.ERROR ? View.VISIBLE : View.GONE}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
             android:layout_gravity="center"
+            android:layout_margin="16dp"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="@{state == FormViewState.ERROR ? View.VISIBLE : View.GONE}">
 
             <TextView
                 android:id="@+id/error"
@@ -55,8 +72,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="@{retryHandler.onRetryClick}"
-                android:text="@string/retry_button_title"/>
+                android:text="@string/retry_button_title" />
 
         </LinearLayout>
-    </FrameLayout>
+    </LinearLayout>
 </layout>

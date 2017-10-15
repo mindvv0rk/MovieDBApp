@@ -2,7 +2,7 @@ package com.ai.moviedbapp.movies;
 
 import android.view.View;
 
-public interface MovieAdapterClickHandler {
+public interface IMovieAdapterClickHandler {
 
     void onMovieClick(View view, long movieId);
 }

@@ -3,6 +3,7 @@ package com.ai.moviedbapp.presenter;
 import com.ai.moviedbapp.core.AbstractPresenter;
 import com.ai.moviedbapp.core.di.Injector;
 import com.ai.moviedbapp.entities.Movie;
+import com.ai.moviedbapp.entities.Sort;
 import com.ai.moviedbapp.interactor.configuration.IConfigurationInteractor;
 import com.ai.moviedbapp.interactor.movie.IMovieInteractor;
 import com.ai.moviedbapp.movies.IMovieView;
@@ -31,16 +32,23 @@ public class MoviePresenter extends AbstractPresenter<IMovieView> {
 
     private List<Movie> mMovies;
     private Subscription mLoadingMovies;
+    private Sort mSort;
 
     public MoviePresenter() {
         Injector.getInstance().initMovieComponent().inject(this);
         mMovies = new ArrayList<>();
-        loadMovies();
+        mSort = new Sort();
+        loadMovies(mSort);
+    }
+
+    public void changeSortType() {
+        mSort.changeSortType();
+        reloadMovies();
     }
 
     public void reloadMovies() {
         mMovies.clear();
-        loadMovies();
+        loadMovies(mSort);
     }
 
     @Override
@@ -50,9 +58,9 @@ public class MoviePresenter extends AbstractPresenter<IMovieView> {
         if (mLoadingMovies != null && !mLoadingMovies.isUnsubscribed()) {
             getView().showLoading();
         } else if (mMovies.isEmpty()) {
-            loadMovies();
+            loadMovies(mSort);
         } else {
-            getView().showData(mMovies);
+            getView().showData(mMovies, mSort);
         }
     }
 
@@ -62,16 +70,16 @@ public class MoviePresenter extends AbstractPresenter<IMovieView> {
         Injector.getInstance().destroyMovieComponent();
     }
 
-    private void loadMovies() {
+    private void loadMovies(Sort sort) {
         if (getView() != null) getView().showLoading();
-        mLoadingMovies = mMovieInteractor.loadMovies()
+        mLoadingMovies = mMovieInteractor.loadMovies(sort)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         movies -> {
                             mMovies.clear();
                             mMovies.addAll(movies);
-                            getView().showData(mMovies);
+                            getView().showData(mMovies, mSort);
                         },
                         throwable -> {
                             Log.e(TAG, throwable.getLocalizedMessage(), throwable);
